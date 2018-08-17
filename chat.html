@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WorldChat App</title>
+    <style>
+      * { box-sizing: border-box;}
+      body { font: 13px Helvetica, Arial; }
+      form { background: #90d695; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(73, 208, 77); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #messages { margin-bottom: 40px }
+      input[type=text], select, textarea {
+      width: 10%;
+      padding: 12px;
+      border: 2px solid #ccc;
+       border-radius: 25px;
+       box-sizing: border-box;
+        margin-top: 8px;
+        margin-right: 171px; 
+        margin-bottom: 16px;
+       resize: vertical;
+}
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+.container_title{
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+.container {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+.container_logout {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+input[type=submit] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    margin-right: 161px;
+    border-radius: 25px;
+    border: none;
+      
+    cursor: pointer;
+}
+    </style>
+  </head>
+  <body>
+
+    <!-- Basic Form -->
+    <div align="center" class="container" id="join_div">
+      <h1>Welcome to WorldChat App</h1> <hr><br><br>
+        Name :<input type="text" id="name"  placeholder="Your name"/><br>
+        
+      <input type="submit" value="Submit" id="submit_button">
+    </div>
+<!--  Basic Form -->
+    <div align="center" class="container_title" id="title_div">
+      <marquee direction="down"><h1 align="center"> Welcome to WorldChat</h1></marquee><hr><br><br>
+    </div> 
+    <!--  -->
+    <ul id="messages"></ul>
+    <div id="chat_div">
+      <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    </div>
+    
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script>
+      $(function () {
+        var socket = io('http://192.168.0.102:3000/'); // http://192.168.0.102:3000/ - mama
+        
+        /*Text Box Animation*/
+        $("input").focus(function(){
+        $(this).css("background-color", "#bceda3");
+          });
+        $("input").blur(function(){
+        $(this).css("background-color", "#ffffff");
+          });
+
+
+       
+        /*Text Animation*/
+        $("h1").on({
+        mouseenter: function(){
+            $(this).css("color", "lightblue");
+        },  
+        mouseleave: function(){
+            $(this).css("color", "black");
+          }, 
+        });
+
+
+
+
+         $('#title_div').hide();
+         $('#chat_div').hide();
+         $('#submit_button').click(function(){
+             var obj = {
+                 name : $('#name').val()
+             };
+            console.log("Obj Send :",obj);
+            socket.emit('join_room',obj);  
+            $('#join_div').hide();
+            $('#chat_div').show();
+            $('#title_div').show(); 
+            
+          
+
+         });   
+
+        $('form').submit(function(){
+          socket.emit('send_msg', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+        socket.on('msg_broadcast', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+  </body>
+</html>
